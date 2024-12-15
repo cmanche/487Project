@@ -1,3 +1,4 @@
+-- BASED FROM FILE USED IN LAB, CHANGES ARE COMMENTED
 -- file: clk_wiz_0.vhd
 -- 
 -- (c) Copyright 2008 - 2013 Xilinx, Inc. All rights reserved.
