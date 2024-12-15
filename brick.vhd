@@ -1,4 +1,3 @@
-
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.STD_LOGIC_ARITH.ALL;
@@ -23,7 +22,16 @@ architecture Behavioral of brick is
     CONSTANT brick_h : INTEGER := 20; -- heihgt in pix
 
 begin
-
-
+    -- pixel ofr brick logic
+    draw_brick : PROCESS (pixel_row, pixel_col, brick_x, brick_y, in_play)
+    BEGIN 
+        IF (in_play = '1' AND 
+            pixel_col >= brick_x AND pixel_col <= brick_x + brick_w AND 
+            pixel_row >= brick_y AND pixel_row <= brick_y + brick_h) THEN 
+            brick_on <= '1';
+        ELSE 
+            brick_on <= '0';
+        END IF;
+    END PROCESS;
 
 end Behavioral;
