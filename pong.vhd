@@ -97,6 +97,22 @@ BEGIN
         blue => S_blue
     );
     
+    -- CHNAGE: BRICK MOVEMENT
+    -- assign everything
+    add_bricks : brick_mvmt
+    PORT MAP(
+        v_sync => S_vsync,
+        pixel_row => S_pixel_row,
+        pixel_col => S_pixel_col,
+        ball_x => ball_x_pos,
+        ball_y => ball_y_pos,
+        red => brick_red,
+        green => brick_green,
+        blue => brick_blue,
+        impact => brick_impact
+    );
+    -- continue
+    
     vga_driver : vga_sync
     PORT MAP(--instantiate vga_sync component
         pixel_clk => pxl_clk, 
