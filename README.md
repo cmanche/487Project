@@ -21,7 +21,9 @@ Make sure to have a VGA Connector Cable and a VGA compatible monitor to run the 
 - BTNR/BTND: Player 2 paddle up and down.
 - BTCU button will reset the game.
 - Full usage of the 7 Segment display to display scores.
-- VGA functionality to connect to a monitor. 
+- VGA functionality to connect to a monitor.
+![Block Diagram](https://github.com/cmanche/487Project/blob/main/pong.png)
+Above is a block diagram showing basic interactions between our modules and the inputs from the players.
 
 ## Images
 ![PONG](https://github.com/cmanche/487Project/blob/main/20241216_164622403_iOS.jpg)
