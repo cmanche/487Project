@@ -8,6 +8,8 @@ References: Building off the source code from Lab 6 - https://github.com/byett/d
 Our brick breaker game is simple. 5 rows of bricks are in a line and, just like with the visuals in lab 6, the bat and the ball bounce. When pressing the BTNC button on the board the game should start by spawning a blue ball that bounces off the bricks, sides of the screen, and bat.  When a ball hits a brick, the brick should disappear and the ball should bounce off in an exit angle equal to the angle of entry. This is true for the bat and the wall logic. The colors of the game will have green bricks, a blue ball, and a yellow bat. After all the bricks are broken, you can reset the game to its initial state by pressing the BTNC button once again. The rightmost switch on the board is programmed to implement a warp game mode. This will function the same except instead of bouncing off the walls the ball will just come from the other wall, ie. if the ball hits the right wall at a certain angle then the bat will come out of the left wall at the same angle. 
 
 ## How to set up and run our program?
+Make sure to have a VGA Connector Cable and a VGA compatible monitor to run the Brick Breaker game. 
+
 1) Download the source files in this git repo.
 2) Create a new project and upload the source files when prompted; upload the constraint file when prompted.
 3) Click Generate Bitstream and yes until you get to the "bitstream successfully generated" screen.
