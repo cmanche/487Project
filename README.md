@@ -30,6 +30,18 @@ Above is a block diagram showing basic interactions between our modules and the 
 ![PONG](https://github.com/cmanche/487Project/blob/main/20241216_164622403_iOS.jpg)
 Our pong instance! You can see we kept it simple and made an RGB color format. The paddles are red and blue, background is green with a white stripe, and the pong bal would be black in color. 
 
+## Division of Labor
+Chris:
+- Developed the logic for the second paddle and integrated wall physics for horizontal gameplay.
+- Implemented axis rotation to transition gameplay from vertical to horizontal.
+- Balanced paddle speeds for smoother and more competitive gameplay.
+
+Will:
+- Mapped button functionality for two players on a single board.
+- Designed and implemented the points system for real-time scoring.
+- Added color changes to differentiate paddles, ball, and background.
+- Incorporated audio feedback and switch-based speeds for dynamic gameplay customization.
+
 ## _Submission (80% of your project grade):_
 - _Your final submission should be a github repository of very similar format to the labs themselves with an opening README document with the expected components as follows:_
   - _A description of the expected behavior of the project, attachments needed (speaker module, VGA connector, etc.), related images/diagrams, etc. (10 points of the Submission category)_
