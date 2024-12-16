@@ -17,8 +17,14 @@ Make sure to have a VGA Connector Cable and a VGA compatible monitor to run the 
 5) Connect your VGA Cable to the Nexus board and a compatible monitor. 
 
 ## Inputs and Outputs
+- BTNL/BTNU: Player 1 paddle up and down.
+- BTNR/BTND: Player 2 paddle up and down.
 - BTCU button will reset the game.
-- BTNL will move the bat to the left and BTNR will move the bat to the right.
+- Full usage of the 7 Segment display to display scores.
+- VGA functionality to connect to a monitor. 
+
+## Images
+
 
 ## _Submission (80% of your project grade):_
 - _Your final submission should be a github repository of very similar format to the labs themselves with an opening README document with the expected components as follows:_
