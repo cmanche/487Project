@@ -94,8 +94,8 @@ Will:
 - Randomized initial serve direction upon game start.
 
 ### Visual Adjustments:
-Rendered both paddles and the ball using separate signals (bat1_on, bat2_on, ball_on).
-Enhanced visuals with distinct colors for paddles, ball, and background.
+- Rendered both paddles and the ball using separate signals (bat1_on, bat2_on, ball_on).
+- Enhanced visuals with distinct colors for paddles, ball, and background.
 
 
 ## _Submission (80% of your project grade):_
