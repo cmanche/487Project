@@ -1,8 +1,8 @@
 # 487 Project: Pong
 Authors: William Chimbay and Chris Mancheno
 
-References: Building off the source code from Lab 6 - https://github.com/byett/dsd/tree/CPE487-Fall2024/Nexys-A7/Lab-6
-
+References: Building off the source code from Lab 6 per Professor Yett - https://github.com/byett/dsd/tree/CPE487-Fall2024/Nexys-A7/Lab-6
+Modules modified: pong.vhd, bat_n_ball.vhd, pong.xdc
 
 ## What to expect?
 The Pong game is a two-player competitive arcade game designed to run on the Nexys FPGA board. Each player controls a paddle that can move vertically along their side of the screen using dedicated buttons on the board. The game begins when the ball is served from the center of the screen, moving diagonally toward one of the paddles. Players must bounce the ball back toward their opponent by intercepting it with their paddle. The ball bounces off walls and paddles, with its speed increasing slightly after every successful paddle hit. If the ball passes a paddle, the opposing player earns a point, and the ball resets to the center. The scores for both players are displayed on the VGA screen in real-time. Players can reset the game, including scores and ball position, by pressing the reset button.
