@@ -42,6 +42,61 @@ Will:
 - Added color changes to differentiate paddles, ball, and background.
 - Incorporated audio feedback and switch-based speeds for dynamic gameplay customization.
 
+## Overview of Changes Made in pong.vhd and bat_n_ball.vhd
+### Key Modifications in **pong.vhd**
+
+### Two-Paddle Gameplay Logic:
+- Added support for two players with separate controls:
+- Player 1: btnl (up) and btnd (down).
+- Player 2: btnu (up) and btnr (down).
+- Replaced single paddle position (batpos) with separate signals for each paddle (bat1pos for Player 1 and bat2pos for Player 2).
+
+### Score System:
+- Introduced two separate score registers (score1 and score2) to track points for each player.
+- Updated the seven-segment display logic to display both players' scores.
+- Integration of Modified bat_n_ball:
+
+### Replaced the original bat_x signal with bat1_y and bat2_y for the two paddles.
+- Passed scores (score1 and score2) to and from the bat_n_ball component.
+  
+### Enhanced Paddle Movement:
+- Adjusted movement boundaries for vertical gameplay (paddles restricted between bat_h and 600 - bat_h).
+- Synchronized paddle movement with clock signal to ensure smooth gameplay.
+
+### Updated Visual Rendering:
+- Instantiated bat_n_ball with signals for two paddles and ball trajectory.
+- Adjusted color assignments for better visual clarity:
+- Red: Represents active paddles and the ball.
+- Key Modifications in bat_n_ball.vhd
+  
+### Two-Paddle Logic:
+- Replaced the single bat_x signal with fixed paddle positions:
+- bat1_x (left paddle) and bat2_x (right paddle).
+- Added signals for the vertical positions of both paddles (bat1_y and bat2_y).
+
+### Ball Collision Detection:
+- Added separate collision detection for each paddle:
+- Left paddle (bat1): Reflects the ball when it reaches the left boundary.
+- Right paddle (bat2): Reflects the ball when it reaches the right boundary.
+- Ensured proper ball reflection based on paddle position and size.
+  
+### Score Tracking:
+- Introduced registers for Player 1 (score1_reg) and Player 2 (score2_reg) scores.
+  
+### Updated scores when the ball passes either paddle:
+- Left paddle miss: Increment Player 2's score.
+- Right paddle miss: Increment Player 1's score.
+
+### Improved Ball Physics:
+- Ball movement now accounts for top and bottom wall collisions.
+- Speed and trajectory of the ball dynamically adjusted after paddle collisions.
+- Randomized initial serve direction upon game start.
+
+### Visual Adjustments:
+Rendered both paddles and the ball using separate signals (bat1_on, bat2_on, ball_on).
+Enhanced visuals with distinct colors for paddles, ball, and background.
+
+
 ## _Submission (80% of your project grade):_
 - _Your final submission should be a github repository of very similar format to the labs themselves with an opening README document with the expected components as follows:_
   - _A description of the expected behavior of the project, attachments needed (speaker module, VGA connector, etc.), related images/diagrams, etc. (10 points of the Submission category)_
