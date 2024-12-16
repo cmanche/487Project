@@ -12,9 +12,14 @@ ENTITY pong IS
         VGA_blue : OUT STD_LOGIC_VECTOR (3 DOWNTO 0);
         VGA_hsync : OUT STD_LOGIC;
         VGA_vsync : OUT STD_LOGIC;
-        btnl : IN STD_LOGIC;
-        btnr : IN STD_LOGIC;
-        btn0 : IN STD_LOGIC;
+--        btnl : IN STD_LOGIC;
+--        btnr : IN STD_LOGIC;
+        -- CHANGE: Added buttons for both players
+        btnl : IN STD_LOGIC; -- Player 1 up
+        btnd : IN STD_LOGIC; -- Player 1 down
+        btnu : IN STD_LOGIC; -- Player 2 up
+        btnr : IN STD_LOGIC; -- Player 2 down
+        btn0 : IN STD_LOGIC; -- serve
         SEG7_anode : OUT STD_LOGIC_VECTOR (7 DOWNTO 0); -- anodes of four 7-seg displays
         SEG7_seg : OUT STD_LOGIC_VECTOR (6 DOWNTO 0)
     ); 
@@ -30,12 +35,20 @@ ARCHITECTURE Behavioral OF pong IS
     SIGNAL count : STD_LOGIC_VECTOR (20 DOWNTO 0);
     SIGNAL display : std_logic_vector (15 DOWNTO 0); -- value to be displayed
     SIGNAL led_mpx : STD_LOGIC_VECTOR (2 DOWNTO 0); -- 7-seg multiplexing clock
+    -- change: additional signal req
+    SIGNAL bat1pos : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(300, 11);
+    SIGNAL bat2pos : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(300, 11);
+    SIGNAL score1, score2 : STD_LOGIC_VECTOR (3 DOWNTO 0);    
+    CONSTANT bat_h : INTEGER := 20; -- match the value from bat_n_ball.vhd
     COMPONENT bat_n_ball IS
         PORT (
             v_sync : IN STD_LOGIC;
             pixel_row : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
             pixel_col : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
-            bat_x : IN STD_LOGIC_VECTOR (10 DOWNTO 0);
+ --           bat_x : IN STD_LOGIC_VECTOR (10 DOWNTO 0);
+            -- must be routed thru
+            bat1_y : IN STD_LOGIC_VECTOR (10 DOWNTO 0); -- left bat y position
+            bat2_y : IN STD_LOGIC_VECTOR (10 DOWNTO 0); -- right bat y position             
             serve : IN STD_LOGIC;
             red : OUT STD_LOGIC;
             green : OUT STD_LOGIC;
@@ -73,16 +86,36 @@ ARCHITECTURE Behavioral OF pong IS
     END COMPONENT; 
     
 BEGIN
-    pos : PROCESS (clk_in) is
+--    pos : PROCESS (clk_in) is
+--    BEGIN
+--        if rising_edge(clk_in) then
+--            count <= count + 1;
+--            IF (btnl = '1' and count = 0 and batpos > 0) THEN
+--                batpos <= batpos - 10;
+--            ELSIF (btnr = '1' and count = 0 and batpos < 800) THEN
+--                batpos <= batpos + 10;
+--            END IF;
+--        end if;
+--    END PROCESS;
+    -- must account for both bats now
+    pos : PROCESS (clk_in)
     BEGIN
-        if rising_edge(clk_in) then
+        IF rising_edge(clk_in) THEN
             count <= count + 1;
-            IF (btnl = '1' and count = 0 and batpos > 0) THEN
-                batpos <= batpos - 10;
-            ELSIF (btnr = '1' and count = 0 and batpos < 800) THEN
-                batpos <= batpos + 10;
+            -- Player 1 (left) bat movement
+            IF (btnl = '1' AND count = 0 AND bat1pos > bat_h) THEN
+                bat1pos <= bat1pos - 10;
+            ELSIF (btnd = '1' AND count = 0 AND bat1pos < 600 - bat_h) THEN
+                bat1pos <= bat1pos + 10;
             END IF;
-        end if;
+            
+            -- Player 2 (right) bat movement
+            IF (btnu = '1' AND count = 0 AND bat2pos > bat_h) THEN
+                bat2pos <= bat2pos - 10;
+            ELSIF (btnr = '1' AND count = 0 AND bat2pos < 600 - bat_h) THEN
+                bat2pos <= bat2pos + 10;
+            END IF;
+        END IF;
     END PROCESS;
     led_mpx <= count(19 DOWNTO 17); -- 7-seg multiplexing clock    
     add_bb : bat_n_ball
@@ -90,28 +123,16 @@ BEGIN
         v_sync => S_vsync, 
         pixel_row => S_pixel_row, 
         pixel_col => S_pixel_col, 
-        bat_x => batpos, 
-        serve => btn0, 
-        red => S_red, 
-        green => S_green, 
-        blue => S_blue
+--        bat_x => batpos,
+        bat1_y => bat1pos,
+        bat2_y => bat2pos,
+        serve => btn0,
+        red => S_red,
+        green => S_green,
+        blue => S_blue,
+        score1 => score1,
+        score2 => score2
     );
-    
-    -- CHNAGE: BRICK MOVEMENT
-    -- assign everything
-    add_bricks : brick_mvmt
-    PORT MAP(
-        v_sync => S_vsync,
-        pixel_row => S_pixel_row,
-        pixel_col => S_pixel_col,
-        ball_x => ball_x_pos,
-        ball_y => ball_y_pos,
-        red => brick_red,
-        green => brick_green,
-        blue => brick_blue,
-        impact => brick_impact
-    );
-    -- continue
     
     vga_driver : vga_sync
     PORT MAP(--instantiate vga_sync component
@@ -139,4 +160,6 @@ BEGIN
       dig => led_mpx, data => display, 
       anode => SEG7_anode, seg => SEG7_seg
     );
+    -- CHANGE: Update display signal to show both scores
+    display <= score2 & score1; -- Show both scores on 7-segment display
 END Behavioral;
