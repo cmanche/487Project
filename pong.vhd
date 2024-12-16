@@ -12,14 +12,15 @@ ENTITY pong IS
         VGA_blue : OUT STD_LOGIC_VECTOR (3 DOWNTO 0);
         VGA_hsync : OUT STD_LOGIC;
         VGA_vsync : OUT STD_LOGIC;
---        btnl : IN STD_LOGIC;
---        btnr : IN STD_LOGIC;
+--      btnl : IN STD_LOGIC;
+--      btnr : IN STD_LOGIC;
         -- CHANGE: Added buttons for both players
         btnl : IN STD_LOGIC; -- Player 1 up
         btnd : IN STD_LOGIC; -- Player 1 down
         btnu : IN STD_LOGIC; -- Player 2 up
         btnr : IN STD_LOGIC; -- Player 2 down
         btn0 : IN STD_LOGIC; -- serve
+        sw : IN STD_LOGIC_VECTOR(2 DOWNTO 0);  -- add switches for game mode ctrl
         SEG7_anode : OUT STD_LOGIC_VECTOR (7 DOWNTO 0); -- anodes of four 7-seg displays
         SEG7_seg : OUT STD_LOGIC_VECTOR (6 DOWNTO 0)
     ); 
@@ -39,13 +40,13 @@ ARCHITECTURE Behavioral OF pong IS
     SIGNAL bat1pos : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(300, 11);
     SIGNAL bat2pos : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(300, 11);
     SIGNAL score1, score2 : STD_LOGIC_VECTOR (3 DOWNTO 0);    
-    CONSTANT bat_h : INTEGER := 20; -- match the value from bat_n_ball.vhd
+    CONSTANT bat_h : INTEGER := 50; -- match value from bat_n_ball.vhd
     COMPONENT bat_n_ball IS
         PORT (
             v_sync : IN STD_LOGIC;
             pixel_row : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
             pixel_col : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
- --           bat_x : IN STD_LOGIC_VECTOR (10 DOWNTO 0);
+ --         bat_x : IN STD_LOGIC_VECTOR (10 DOWNTO 0);
             -- must be routed thru
             bat1_y : IN STD_LOGIC_VECTOR (10 DOWNTO 0); -- left bat y position
             bat2_y : IN STD_LOGIC_VECTOR (10 DOWNTO 0); -- right bat y position             
@@ -55,7 +56,8 @@ ARCHITECTURE Behavioral OF pong IS
             blue : OUT STD_LOGIC;
             --mapped
             score1 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-            score2 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0)
+            score2 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+            speed_mode : IN STD_LOGIC_VECTOR(2 DOWNTO 0)
         );
     END COMPONENT;
     COMPONENT vga_sync IS
@@ -100,19 +102,20 @@ BEGIN
 --            END IF;
 --        end if;
 --    END PROCESS;
+
     -- must account for both bats now
     pos : PROCESS (clk_in)
     BEGIN
         IF rising_edge(clk_in) THEN
             count <= count + 1;
-            -- Player 1 (left) bat movement
+            -- player 1 (left) bat movement
             IF (btnl = '1' AND count = 0 AND bat1pos > bat_h) THEN
                 bat1pos <= bat1pos - 10;
             ELSIF (btnd = '1' AND count = 0 AND bat1pos < 600 - bat_h) THEN
                 bat1pos <= bat1pos + 10;
             END IF;
             
-            -- Player 2 (right) bat movement
+            -- player 2 (right) bat movement
             IF (btnu = '1' AND count = 0 AND bat2pos > bat_h) THEN
                 bat2pos <= bat2pos - 10;
             ELSIF (btnr = '1' AND count = 0 AND bat2pos < 600 - bat_h) THEN
@@ -120,6 +123,7 @@ BEGIN
             END IF;
         END IF;
     END PROCESS;
+    
     led_mpx <= count(19 DOWNTO 17); -- 7-seg multiplexing clock    
     add_bb : bat_n_ball
     PORT MAP(--instantiate bat and ball component
@@ -134,7 +138,9 @@ BEGIN
         green => S_green,
         blue => S_blue,
         score1 => score1,
-        score2 => score2
+        score2 => score2,
+        -- map sw to ball speed
+        speed_mode => sw
     );
     
     vga_driver : vga_sync
@@ -163,7 +169,10 @@ BEGIN
       dig => led_mpx, data => display, 
       anode => SEG7_anode, seg => SEG7_seg
     );
-    -- CHANGE: Update display signal to show both scores
+--  CHANGE: Update display signal to show both scores
 --  display <= score2 & score1; -- Show both scores on 7-segment display
-    display <= "0000" & score2 & "0000" & score1; -- Pad each 4-bit score with leading zeros
+--  display <= "0000" & score1 & "0000" & score2; -- Pad each 4-bit score with leading zeros
+    display <= score1 & "0000" & score2 & "0000";
+--  using all anodes
+
 END Behavioral;
