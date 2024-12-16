@@ -164,5 +164,6 @@ BEGIN
       anode => SEG7_anode, seg => SEG7_seg
     );
     -- CHANGE: Update display signal to show both scores
-    display <= score2 & score1; -- Show both scores on 7-segment display
+--  display <= score2 & score1; -- Show both scores on 7-segment display
+    display <= "0000" & score2 & "0000" & score1; -- Pad each 4-bit score with leading zeros
 END Behavioral;
