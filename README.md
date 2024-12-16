@@ -23,6 +23,7 @@ Make sure to have a VGA Connector Cable and a VGA compatible monitor to run the 
 - Full usage of the 7 Segment display to display scores.
 - VGA functionality to connect to a monitor.
 ![Block Diagram](https://github.com/cmanche/487Project/blob/main/pong.png)
+
 Above is a block diagram showing basic interactions between our modules and the inputs from the players.
 
 ## Images
