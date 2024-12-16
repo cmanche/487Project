@@ -24,7 +24,7 @@ Make sure to have a VGA Connector Cable and a VGA compatible monitor to run the 
 - VGA functionality to connect to a monitor. 
 
 ## Images
-
+[!PONG](https://github.com/cmanche/487Project/blob/main/20241216_164622403_iOS.jpg)
 
 ## _Submission (80% of your project grade):_
 - _Your final submission should be a github repository of very similar format to the labs themselves with an opening README document with the expected components as follows:_
