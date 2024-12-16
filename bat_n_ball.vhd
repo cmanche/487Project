@@ -19,25 +19,33 @@ ENTITY bat_n_ball IS
         blue : OUT STD_LOGIC;
         -- CHANGE: Added score outputs for both players
         score1 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-        score2 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0)
+        score2 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+        speed_mode : IN STD_LOGIC_VECTOR(2 DOWNTO 0)  -- speed mode input
     );
 END bat_n_ball;
 
 ARCHITECTURE Behavioral OF bat_n_ball IS
     CONSTANT bsize : INTEGER := 8; -- ball size in pixels
---    CONSTANT bat_w : INTEGER := 20; -- bat width in pixels
---    CONSTANT bat_h : INTEGER := 3; -- bat height in pixels
+--  CONSTANT bat_w : INTEGER := 20; -- bat width in pixels
+--  CONSTANT bat_h : INTEGER := 3; -- bat height in pixels
     -- CHANGE: Modified bat dimensions for vertical orientation
     CONSTANT bat_w : INTEGER := 3; -- bat width in pixels
-    CONSTANT bat_h : INTEGER := 20; -- bat height in pixels
-    -- CHANGE: Added fixed x positions for both bats
+    CONSTANT bat_h : INTEGER := 50; -- bat height in pixels
+--  CHANGE: Added fixed x positions for both bats
     CONSTANT bat1_x : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(20, 11);
     CONSTANT bat2_x : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(780, 11);
-    -- distance ball moves each frame
-    CONSTANT ball_speed : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (6, 11);
+--  distance ball moves each frame
+--  CONSTANT ball_speed : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (6, 11);
+--  CHNAGE: constant speed altered to variable speed based on switches
+    CONSTANT ball_speed_normal : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (6, 11);
+    CONSTANT ball_speed_fast : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (8, 11);
+    CONSTANT ball_speed_faster : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (10, 11);
+    
+    SIGNAL ball_speed : STD_LOGIC_VECTOR (10 DOWNTO 0);
+    
     SIGNAL ball_on : STD_LOGIC; -- indicates whether ball is at current pixel position
 --  SIGNAL bat_on : STD_LOGIC; -- indicates whether bat at over current pixel position
--- CHNAGE
+--  CHNAGE
     SIGNAL bat1_on : STD_LOGIC; -- indicates whether left bat is at current pixel position
     SIGNAL bat2_on : STD_LOGIC; -- indicates whether right bat is at current pixel position
     
@@ -51,20 +59,36 @@ ARCHITECTURE Behavioral OF bat_n_ball IS
     SIGNAL ball_x_motion, ball_y_motion : STD_LOGIC_VECTOR(10 DOWNTO 0) := ball_speed;
     
     -- CHANGE: score track
-    SIGNAL score1_reg : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0000";
-    SIGNAL score2_reg : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0000";
+    SIGNAL score1_reg : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0000";  -- Initialize to zero
+    SIGNAL score2_reg : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0000";  -- Initialize to zero
+    
+    SIGNAL center_line : STD_LOGIC;
 BEGIN
 --    red <= NOT bat_on; -- color setup for red ball and cyan bat on white background
 --    green <= NOT ball_on;
 --    blue <= NOT ball_on;
--- COlor reassignment
-    red <= bat1_on OR bat2_on OR ball_on;
-    green <= bat1_on OR bat2_on OR ball_on;
-    blue <= bat1_on OR bat2_on OR ball_on;
+-- COlor reassignment + center line
+-- no color for ball = black
+    red <= bat1_on  OR center_line;
+    green <= center_line OR (NOT (bat1_on OR bat2_on OR ball_on)); -- Green background
+    blue <= bat2_on OR center_line;
+    
+    center_line <= '1' when (pixel_col >= 398 and pixel_col <= 402) else '0';
     
     --  score update
     score1 <= score1_reg;
     score2 <= score2_reg;    
+        -- Process to set speed based on switches
+    process(speed_mode)
+    begin
+        case speed_mode is
+            when "001" => ball_speed <= ball_speed_normal;
+            when "010" => ball_speed <= ball_speed_fast;
+            when "100" => ball_speed <= ball_speed_faster;
+            when others => ball_speed <= ball_speed_normal;
+        end case;
+    end process;
+
     -- process to draw round ball
     -- set ball_on if current pixel address is covered by ball position
     balldraw : PROCESS (ball_x, ball_y, pixel_row, pixel_col) IS
@@ -143,6 +167,7 @@ BEGIN
 --        ELSIF ball_x <= bsize THEN -- bounce off left wall
 --            ball_x_motion <= ball_speed; -- set hspeed to (+ ball_speed) pixels
 --        END IF;
+
     -- base off, but now logic is rotated ess3entially
         IF serve = '1' AND game_on = '0' THEN
             game_on <= '1';
@@ -154,6 +179,7 @@ BEGIN
                 ball_x_motion <= (NOT ball_speed) + 1;
             END IF;
         END IF;
+        
         -- Bounce off top and bottom walls
         IF ball_y <= bsize THEN
             ball_y_motion <= ball_speed;
@@ -170,21 +196,31 @@ BEGIN
 --                ball_y_motion <= (NOT ball_speed) + 1; -- set vspeed to (- ball_speed) pixels
 --        END IF;
 
-    -- bat logic is different
+    -- bat logic is different / incorporate SCORING
         IF ball_x + bsize >= 800 THEN
-            score1_reg <= score1_reg + 1;
+            -- Add one to score1_reg
+            IF score1_reg = "1001" THEN  -- If 9, wrap to 0
+                score1_reg <= "0000";
+            ELSE
+                score1_reg <= score1_reg + 1;
+            END IF;                        
             game_on <= '0';
             ball_x <= CONV_STD_LOGIC_VECTOR(400, 11);
             ball_y <= CONV_STD_LOGIC_VECTOR(300, 11);
-        ELSIF ball_x <= bsize THEN
-            score2_reg <= score2_reg + 1;
+        ELSIF ball_x <= bsize then
+            -- Add one to score2_reg
+            IF score2_reg = "1001" THEN  -- If 9, wrap to 0
+                score2_reg <= "0000";
+            ELSE
+                score2_reg <= score2_reg + 1;
+            END IF;
             game_on <= '0';
             ball_x <= CONV_STD_LOGIC_VECTOR(400, 11);
             ball_y <= CONV_STD_LOGIC_VECTOR(300, 11);
         END IF;
-    -- with l & r handling
-        -- CHANGE: Handle bat collisions for both bats
-        -- Left bat collision
+--         with l & r handling
+--         CHANGE: Handle bat collisions for both bats
+      --   Left bat collision
         IF (ball_x - bsize <= bat1_x + bat_w) AND
            (ball_x + bsize >= bat1_x - bat_w) AND
            (ball_y + bsize >= bat1_y - bat_h) AND
@@ -192,7 +228,7 @@ BEGIN
             ball_x_motion <= ball_speed;
         END IF;
         
-        -- Right bat collision
+      --   Right bat collision
         IF (ball_x + bsize >= bat2_x - bat_w) AND
            (ball_x - bsize <= bat2_x + bat_w) AND
            (ball_y + bsize >= bat2_y - bat_h) AND
@@ -218,6 +254,7 @@ BEGIN
 --            ball_x <= (OTHERS => '0');
 --        ELSE ball_x <= temp(10 DOWNTO 0);
 --        END IF;
+
     -- ball logic now requires attention
     IF game_on = '1' THEN
             -- compute next ball vertical position
