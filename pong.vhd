@@ -39,7 +39,8 @@ ARCHITECTURE Behavioral OF pong IS
     -- change: additional signal req
     SIGNAL bat1pos : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(300, 11);
     SIGNAL bat2pos : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(300, 11);
-    SIGNAL score1, score2 : STD_LOGIC_VECTOR (3 DOWNTO 0);    
+    -- CHANGE: Simplified display assignment for debugging
+    SIGNAL score1, score2 : STD_LOGIC_VECTOR (3 DOWNTO 0);  
     CONSTANT bat_h : INTEGER := 50; -- match value from bat_n_ball.vhd
     COMPONENT bat_n_ball IS
         PORT (
@@ -171,8 +172,7 @@ BEGIN
     );
 --  CHANGE: Update display signal to show both scores
 --  display <= score2 & score1; -- Show both scores on 7-segment display
---  display <= "0000" & score1 & "0000" & score2; -- Pad each 4-bit score with leading zeros
-    display <= score1 & "0000" & score2 & "0000";
---  using all anodes
+    display <= ("0000" & score1 & "0000" & score2);
+--    display <= score2 & X"0" & score1 & X"0"; 
 
 END Behavioral;
