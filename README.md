@@ -25,6 +25,7 @@ Make sure to have a VGA Connector Cable and a VGA compatible monitor to run the 
 
 ## Images
 ![PONG](https://github.com/cmanche/487Project/blob/main/20241216_164622403_iOS.jpg)
+Our pong instance! You can see we kept it simple and made an RGB color format. The paddles are red and blue, background is green with a white stripe, and the pong bal would be black in color. 
 
 ## _Submission (80% of your project grade):_
 - _Your final submission should be a github repository of very similar format to the labs themselves with an opening README document with the expected components as follows:_
