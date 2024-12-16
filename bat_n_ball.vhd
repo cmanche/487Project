@@ -196,28 +196,18 @@ BEGIN
 --                ball_y_motion <= (NOT ball_speed) + 1; -- set vspeed to (- ball_speed) pixels
 --        END IF;
 
-    -- bat logic is different / incorporate SCORING
-        IF ball_x + bsize >= 800 THEN
-            -- Add one to score1_reg
-            IF score1_reg = "1001" THEN  -- If 9, wrap to 0
-                score1_reg <= "0000";
-            ELSE
-                score1_reg <= score1_reg + 1;
-            END IF;                        
+        IF ball_x + bsize >= 800 THEN  -- Right wall, point for player 1
+            score1_reg <= score1_reg + "0001";  -- Explicit 4-bit addition
             game_on <= '0';
             ball_x <= CONV_STD_LOGIC_VECTOR(400, 11);
             ball_y <= CONV_STD_LOGIC_VECTOR(300, 11);
-        ELSIF ball_x <= bsize then
-            -- Add one to score2_reg
-            IF score2_reg = "1001" THEN  -- If 9, wrap to 0
-                score2_reg <= "0000";
-            ELSE
-                score2_reg <= score2_reg + 1;
-            END IF;
+        ELSIF ball_x <= bsize THEN     -- Left wall, point for player 2
+            score2_reg <= score2_reg + "0001";  -- Explicit 4-bit addition
             game_on <= '0';
             ball_x <= CONV_STD_LOGIC_VECTOR(400, 11);
             ball_y <= CONV_STD_LOGIC_VECTOR(300, 11);
         END IF;
+        
 --         with l & r handling
 --         CHANGE: Handle bat collisions for both bats
       --   Left bat collision
