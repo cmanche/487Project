@@ -52,7 +52,10 @@ ARCHITECTURE Behavioral OF pong IS
             serve : IN STD_LOGIC;
             red : OUT STD_LOGIC;
             green : OUT STD_LOGIC;
-            blue : OUT STD_LOGIC
+            blue : OUT STD_LOGIC;
+            --mapped
+            score1 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+            score2 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0)
         );
     END COMPONENT;
     COMPONENT vga_sync IS
