@@ -67,7 +67,8 @@ Will:
 - Instantiated bat_n_ball with signals for two paddles and ball trajectory.
 - Adjusted color assignments for better visual clarity:
 - Red: Represents active paddles and the ball.
-- Key Modifications in bat_n_ball.vhd
+
+### Key Modifications in bat_n_ball.vhd
   
 ### Two-Paddle Logic:
 - Replaced the single bat_x signal with fixed paddle positions:
