@@ -1,11 +1,11 @@
-# 487Project: Brick Breaker
+# 487 Project: Pong
 Authors: William Chimbay and Chris Mancheno
 
 References: Building off the source code from Lab 6 - https://github.com/byett/dsd/tree/CPE487-Fall2024/Nexys-A7/Lab-6
 
 
 ## What to expect?
-Our brick breaker game is simple. 5 rows of bricks are in a line and, just like with the visuals in lab 6, the bat and the ball bounce. When pressing the BTNC button on the board the game should start by spawning a blue ball that bounces off the bricks, sides of the screen, and bat.  When a ball hits a brick, the brick should disappear and the ball should bounce off in an exit angle equal to the angle of entry. This is true for the bat and the wall logic. The colors of the game will have green bricks, a blue ball, and a yellow bat. After all the bricks are broken, you can reset the game to its initial state by pressing the BTNC button once again. The 5 switches on the right are programmed to increase the ball speed by 1 for each switch. This is intended to give the player a customizable difficulty gameplay mechanic. 
+The Pong game is a two-player competitive arcade game designed to run on the Nexys FPGA board. Each player controls a paddle that can move vertically along their side of the screen using dedicated buttons on the board. The game begins when the ball is served from the center of the screen, moving diagonally toward one of the paddles. Players must bounce the ball back toward their opponent by intercepting it with their paddle. The ball bounces off walls and paddles, with its speed increasing slightly after every successful paddle hit. If the ball passes a paddle, the opposing player earns a point, and the ball resets to the center. The scores for both players are displayed on the VGA screen in real-time. Players can reset the game, including scores and ball position, by pressing the reset button.
 
 ## How to set up and run our program?
 Make sure to have a VGA Connector Cable and a VGA compatible monitor to run the Brick Breaker game. 
