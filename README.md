@@ -16,6 +16,10 @@ Make sure to have a VGA Connector Cable and a VGA compatible monitor to run the 
 4) Connect your board to your laptop and open Hardware -> open target -> auto connect (make sure your board is on) -> program device. 
 5) Connect your VGA Cable to the Nexus board and a compatible monitor. 
 
+## Inputs and Outputs
+- BTCU button will reset the game.
+- BTNL will move the bat to the left and BTNR will move the bat to the right.
+
 ## _Submission (80% of your project grade):_
 - _Your final submission should be a github repository of very similar format to the labs themselves with an opening README document with the expected components as follows:_
   - _A description of the expected behavior of the project, attachments needed (speaker module, VGA connector, etc.), related images/diagrams, etc. (10 points of the Submission category)_
