@@ -21,7 +21,7 @@ ENTITY pong IS
         btnr : IN STD_LOGIC; -- Player 2 down
         btn0 : IN STD_LOGIC; -- serve
 --      sw : IN STD_LOGIC_VECTOR(2 DOWNTO 0);  -- add switches for game mode ctrl
-        sw : IN STD_LOGIC_VECTOR(15 DOWNTO 0);  -- Extended to use more switches
+        sw : IN STD_LOGIC_VECTOR(15 DOWNTO 0);  -- extended to use more switches
         SEG7_anode : OUT STD_LOGIC_VECTOR (7 DOWNTO 0); -- anodes of four 7-seg displays
         SEG7_seg : OUT STD_LOGIC_VECTOR (6 DOWNTO 0)
     ); 
@@ -60,7 +60,7 @@ ARCHITECTURE Behavioral OF pong IS
             score1 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
             score2 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
             speed_mode : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-            -- CHANGE: Add the new control ports to component
+            -- CHANGE: add the new control ports to component
             invert_background : IN STD_LOGIC;
             invert_paddles : IN STD_LOGIC;
             random_bounce : IN STD_LOGIC
@@ -136,7 +136,7 @@ BEGIN
         v_sync => S_vsync, 
         pixel_row => S_pixel_row, 
         pixel_col => S_pixel_col, 
---        bat_x => batpos,
+--      bat_x => batpos,
         bat1_y => bat1pos,
         bat2_y => bat2pos,
         serve => btn0,
@@ -147,7 +147,7 @@ BEGIN
         score2 => score2,
         -- map sw to ball speed
         speed_mode => sw(2 DOWNTO 0),
-        -- CHANGE: Added new control mappings
+        -- CHANGE:added new control mappings
         invert_background => sw(15),
         invert_paddles => sw(14),
         random_bounce => sw(13)
@@ -179,9 +179,11 @@ BEGIN
       dig => led_mpx, data => display, 
       anode => SEG7_anode, seg => SEG7_seg
     );
---  CHANGE: Update display signal to show both scores
+--  CHANGE: update display signal to show both scores
+        -- played around with this a lot, but could quite get the digits to populate both 'halves' of 8 led's
+        -- did our best though
 --  display <= score2 & score1; -- Show both scores on 7-segment display
     display <= ("0000" & score1 & "0000" & score2);
---    display <= score2 & X"0" & score1 & X"0"; 
+--  display <= score2 & X"0" & score1 & X"0"; 
 
 END Behavioral;
