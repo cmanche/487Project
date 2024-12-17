@@ -20,7 +20,8 @@ ENTITY pong IS
         btnu : IN STD_LOGIC; -- Player 2 up
         btnr : IN STD_LOGIC; -- Player 2 down
         btn0 : IN STD_LOGIC; -- serve
-        sw : IN STD_LOGIC_VECTOR(2 DOWNTO 0);  -- add switches for game mode ctrl
+--      sw : IN STD_LOGIC_VECTOR(2 DOWNTO 0);  -- add switches for game mode ctrl
+        sw : IN STD_LOGIC_VECTOR(15 DOWNTO 0);  -- Extended to use more switches
         SEG7_anode : OUT STD_LOGIC_VECTOR (7 DOWNTO 0); -- anodes of four 7-seg displays
         SEG7_seg : OUT STD_LOGIC_VECTOR (6 DOWNTO 0)
     ); 
@@ -58,7 +59,11 @@ ARCHITECTURE Behavioral OF pong IS
             --mapped
             score1 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
             score2 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-            speed_mode : IN STD_LOGIC_VECTOR(2 DOWNTO 0)
+            speed_mode : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+            -- CHANGE: Add the new control ports to component
+            invert_background : IN STD_LOGIC;
+            invert_paddles : IN STD_LOGIC;
+            random_bounce : IN STD_LOGIC
         );
     END COMPONENT;
     COMPONENT vga_sync IS
@@ -141,7 +146,11 @@ BEGIN
         score1 => score1,
         score2 => score2,
         -- map sw to ball speed
-        speed_mode => sw
+        speed_mode => sw(2 DOWNTO 0),
+        -- CHANGE: Added new control mappings
+        invert_background => sw(15),
+        invert_paddles => sw(14),
+        random_bounce => sw(13)
     );
     
     vga_driver : vga_sync
