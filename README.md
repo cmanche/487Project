@@ -35,12 +35,13 @@ Chris:
 - Developed the logic for the second paddle and integrated wall physics for horizontal gameplay.
 - Implemented axis rotation to transition gameplay from vertical to horizontal.
 - Balanced paddle speeds for smoother and more competitive gameplay.
+- Implemented switch-based speeds for dynamic gameplay customization.
 
 Will:
 - Mapped button functionality for two players on a single board.
 - Designed and implemented the points system for real-time scoring.
 - Added color changes to differentiate paddles, ball, and background.
-- Incorporated audio feedback and switch-based speeds for dynamic gameplay customization.
+- Implemented randomess from bat impacts and serve as opposed to continuous tragectory.
 
 ## Overview of Changes Made in pong.vhd and bat_n_ball.vhd
 ### Key Modifications in **pong.vhd**
@@ -83,6 +84,7 @@ Will:
   
 ### Score Tracking:
 - Introduced registers for Player 1 (score1_reg) and Player 2 (score2_reg) scores.
+- Meant for change to be displayed with player1 populating left four LED's, but ran into complications
   
 ### Updated scores when the ball passes either paddle:
 - Left paddle miss: Increment Player 2's score.
@@ -90,11 +92,18 @@ Will:
 
 ### Improved Ball Physics:
 - Ball movement now accounts for top and bottom wall collisions.
-- Speed and trajectory of the ball dynamically adjusted after paddle collisions.
+- Trajectory of the ball dynamically adjusted after paddle collisions.
+  - Randomness with paddle impact controlled by switch 14 (3rd from leftmost)
 - Randomized initial serve direction upon game start.
+- Ball speed controlled by switches 1, 2, and 3 (assuming counting from right to left)
+  - Switch 1: Normal speed
+  - Switch 2: Faster speed
+  - Switch 3: Fastest speed
 
 ### Visual Adjustments:
 - Rendered both paddles and the ball using separate signals (bat1_on, bat2_on, ball_on).
 - Enhanced visuals with distinct colors for paddles, ball, and background.
+  - Switch 16: Flip ball and court colors
+  - Switch 15: Flip paddle colors
 
 Thank you
