@@ -9,22 +9,22 @@ ENTITY bat_n_ball IS
         v_sync : IN STD_LOGIC;
         pixel_row : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
         pixel_col : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
-        -- CHANGE: Modified to have y positions for both bats instead of x position
-        bat1_y : IN STD_LOGIC_VECTOR (10 DOWNTO 0); -- current left bat y position
-        bat2_y : IN STD_LOGIC_VECTOR (10 DOWNTO 0); -- current right bat y position
+        -- CHANGE: modified to have y positions for both bats instead of x position
+        bat1_y : IN STD_LOGIC_VECTOR (10 DOWNTO 0); -- current left bat y pos
+        bat2_y : IN STD_LOGIC_VECTOR (10 DOWNTO 0); -- current right bat y pos
 --      bat_x : IN STD_LOGIC_VECTOR (10 DOWNTO 0); -- current bat x position
         serve : IN STD_LOGIC; -- initiates serve
         red : OUT STD_LOGIC;
         green : OUT STD_LOGIC;
         blue : OUT STD_LOGIC;
-        -- CHANGE: Added score outputs for both players
+        -- CHANGE: added score outs for players
         score1 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
         score2 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-        speed_mode : IN STD_LOGIC_VECTOR(2 DOWNTO 0);  -- speed mode input
-        -- CHANGE: Added color inversion controls
+        speed_mode : IN STD_LOGIC_VECTOR(2 DOWNTO 0);  -- speed mode in
+        -- CHANGE: added color inversion controls
         invert_background : IN STD_LOGIC;
         invert_paddles : IN STD_LOGIC;
-        -- CHANGE: Added random bounce control
+        -- CHANGE: added random bounce control
         random_bounce : IN STD_LOGIC
     );
 END bat_n_ball;
@@ -33,24 +33,24 @@ ARCHITECTURE Behavioral OF bat_n_ball IS
     CONSTANT bsize : INTEGER := 8; -- ball size in pixels
 --  CONSTANT bat_w : INTEGER := 20; -- bat width in pixels
 --  CONSTANT bat_h : INTEGER := 3; -- bat height in pixels
-    -- CHANGE: Modified bat dimensions for vertical orientation
-    CONSTANT bat_w : INTEGER := 3; -- bat width in pixels
-    CONSTANT bat_h : INTEGER := 50; -- bat height in pixels
---  CHANGE: Added fixed x positions for both bats
+    -- CHANGE: modified bat dim accounting for now vertical orientation
+    CONSTANT bat_w : INTEGER := 3; -- bat w in pixels
+    CONSTANT bat_h : INTEGER := 50; -- bat h in pixels
+--  CHANGE: added fixed x pos for both bats (20 pix from side walls)
     CONSTANT bat1_x : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(20, 11);
     CONSTANT bat2_x : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(780, 11);
 --  distance ball moves each frame
 --  CONSTANT ball_speed : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (6, 11);
 --  CHNAGE: constant speed altered to variable speed based on switches
-    CONSTANT ball_speed_normal : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (6, 11);
-    CONSTANT ball_speed_fast : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (8, 11);
-    CONSTANT ball_speed_faster : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (10, 11);
+    CONSTANT ball_speed_normal : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (5, 11);
+    CONSTANT ball_speed_fast : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (6, 11);
+    CONSTANT ball_speed_faster : STD_LOGIC_VECTOR (10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR (8, 11);
     
     SIGNAL ball_speed : STD_LOGIC_VECTOR (10 DOWNTO 0);
     
     SIGNAL ball_on : STD_LOGIC; -- indicates whether ball is at current pixel position
 --  SIGNAL bat_on : STD_LOGIC; -- indicates whether bat at over current pixel position
---  CHNAGE
+--  CHNAGE: MUST ACCOUNT FOR BOTH BATS NOW
     SIGNAL bat1_on : STD_LOGIC; -- indicates whether left bat is at current pixel position
     SIGNAL bat2_on : STD_LOGIC; -- indicates whether right bat is at current pixel position
     
@@ -58,31 +58,31 @@ ARCHITECTURE Behavioral OF bat_n_ball IS
     -- current ball position - intitialized to center of screen
     SIGNAL ball_x : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(400, 11);
     SIGNAL ball_y : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(300, 11);
-    -- bat vertical position
+    -- bat vertical pos
     CONSTANT bat_y : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(500, 11);
     -- current ball motion - initialized to (+ ball_speed) pixels/frame in both X and Y directions
     SIGNAL ball_x_motion, ball_y_motion : STD_LOGIC_VECTOR(10 DOWNTO 0) := ball_speed;
     
-    -- CHANGE: score track
-    SIGNAL score1_reg : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0000";  -- Initialize to zero
-    SIGNAL score2_reg : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0000";  -- Initialize to zero
+    -- CHANGE: score tracker
+    SIGNAL score1_reg : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0000";  -- set to zero
+    SIGNAL score2_reg : STD_LOGIC_VECTOR(3 DOWNTO 0) := "0000";  -- set to zero
     
-    SIGNAL score1_count : INTEGER RANGE 0 TO 15 := 0;  -- Extended range to handle 10-15
+    SIGNAL score1_count : INTEGER RANGE 0 TO 15 := 0; 
     SIGNAL score2_count : INTEGER RANGE 0 TO 15 := 0;
 
     
-    -- CHANGE: serve control signals
-    SIGNAL serve_count : STD_LOGIC := '0';  -- Toggles every serve
-    SIGNAL serve_dir : STD_LOGIC := '0';    -- Toggles every two serves
+    -- CHANGE: serve ctrl signals
+    SIGNAL serve_count : STD_LOGIC := '0';  -- toggles every serve
+    SIGNAL serve_dir : STD_LOGIC := '0';    -- toggles every two serves
     SIGNAL serve_angle : STD_LOGIC_VECTOR(1 DOWNTO 0) := "00";  -- For varying 
     
     SIGNAL center_line : STD_LOGIC;
     
-    -- CHANGE: Added random number generator signals for paddle bounces
+    -- CHANGE: added random num generator signals for paddle bounces
     SIGNAL rand_counter : STD_LOGIC_VECTOR(2 DOWNTO 0) := "000";
     SIGNAL rand_value : STD_LOGIC_VECTOR(2 DOWNTO 0);
     
-    -- CHANGE: Added color control signals
+    -- CHANGE: color ctrl signals
     SIGNAL background_color : STD_LOGIC;
     SIGNAL ball_color : STD_LOGIC;
     SIGNAL paddle_color : STD_LOGIC;
@@ -91,8 +91,8 @@ BEGIN
 --    red <= NOT bat_on; -- color setup for red ball and cyan bat on white background
 --    green <= NOT ball_on;
 --    blue <= NOT ball_on;
-    -- CHANGE: Color control based on inversion settings
     center_line <= '1' when (pixel_col >= 398 and pixel_col <= 402) else '0';
+    -- CHANGE: Color control based on inversion settings
     background_color <= invert_background;
     ball_color <= NOT invert_background;
     paddle_color <= '1' WHEN invert_paddles = '0' ELSE '0';
@@ -101,24 +101,24 @@ BEGIN
 --    red <= bat1_on  OR center_line;
 --    green <= center_line OR (NOT (bat1_on OR bat2_on OR ball_on)); -- Green background
 --    blue <= bat2_on OR center_line;
-    -- CHANGE: Modified color assignments
-    red <= (bat1_on AND NOT invert_paddles) OR  -- Left paddle red when not inverted
-           (bat2_on AND invert_paddles) OR      -- Right paddle red when inverted
-           center_line;                         -- Center line always white
+    -- CHANGE: mod color assignments
+    red <= (bat1_on AND NOT invert_paddles) OR                                      -- left paddle red when not inverted
+           (bat2_on AND invert_paddles) OR                                          -- right paddle red when inverted
+           center_line;                                                             -- center = white
            
-    green <= (NOT (bat1_on OR bat2_on OR ball_on) AND NOT invert_background) OR  -- Green background when not inverted
-             (ball_on AND invert_background) OR                                   -- Green ball when inverted
-             center_line;                                                        -- Center line always white
+    green <= (NOT (bat1_on OR bat2_on OR ball_on) AND NOT invert_background) OR     -- green background when not inverted
+             (ball_on AND invert_background) OR                                     -- green ball when inverted
+             center_line;                                                           -- center = white
              
-    blue <= (bat2_on AND NOT invert_paddles) OR  -- Right paddle blue when not inverted
-            (bat1_on AND invert_paddles) OR      -- Left paddle blue when inverted
-            center_line;                         -- Center line always white
+    blue <= (bat2_on AND NOT invert_paddles) OR                                     -- right paddle blue when not inverted
+            (bat1_on AND invert_paddles) OR                                         -- left paddle blue when inverted
+            center_line;                                                            -- center = white
     
     --  score update
     score1 <= score1_reg;
     score2 <= score2_reg;    
-        -- Process to set speed based on switches
-    -- CHANGE: Random number generator process
+
+    -- CHANGE: random num generator process
     random_gen : PROCESS(v_sync)
     BEGIN
         IF rising_edge(v_sync) THEN
@@ -128,6 +128,7 @@ BEGIN
     
     rand_value <= rand_counter;
         
+    -- Process to set speed based on switches
     process(speed_mode)
     begin
         case speed_mode is
@@ -173,10 +174,10 @@ BEGIN
 --            bat_on <= '0';
 --        END IF;
 --    END PROCESS;
-    -- new batS process
+    -- new batS process, we now need a left and right
     batdraw : PROCESS (bat1_y, bat2_y, pixel_row, pixel_col) IS
     BEGIN
-        -- Left bat
+        -- left bat
         IF pixel_col >= (bat1_x - bat_w) AND
            pixel_col <= (bat1_x + bat_w) AND
            pixel_row >= (bat1_y - bat_h) AND
@@ -186,7 +187,7 @@ BEGIN
             bat1_on <= '0';
         END IF;
         
-        -- Right bat
+        -- right bat
         IF pixel_col >= (bat2_x - bat_w) AND
            pixel_col <= (bat2_x + bat_w) AND
            pixel_row >= (bat2_y - bat_h) AND
@@ -234,34 +235,34 @@ BEGIN
             game_on <= '1';
             serve_count <= NOT serve_count;
             
-            -- Update serve direction every two serves
+            -- update serve direction every two serves
             IF serve_count = '1' THEN
                 serve_dir <= NOT serve_dir;
             END IF;
             
-            -- Update angle selection
+            -- update angle selection
             serve_angle <= serve_angle + "01";
             
-            -- Set initial ball direction
+            -- initial ball direction
             IF serve_dir = '0' THEN  -- Serve left
                 ball_x_motion <= (NOT ball_speed) + 1;  -- Left
                 CASE serve_angle IS
-                    WHEN "00" => ball_y_motion <= (NOT (ball_speed - 2)) + 1;  -- Slight up
-                    WHEN "01" => ball_y_motion <= ball_speed;                   -- Down
-                    WHEN "10" => ball_y_motion <= (NOT ball_speed) + 1;        -- Up
-                    WHEN OTHERS => ball_y_motion <= (ball_speed - 2);          -- Slight down
+                    WHEN "00" => ball_y_motion <= (NOT (ball_speed - 2)) + 1;   -- light up
+                    WHEN "01" => ball_y_motion <= ball_speed;                   -- DOWN
+                    WHEN "10" => ball_y_motion <= (NOT ball_speed) + 1;         -- UP
+                    WHEN OTHERS => ball_y_motion <= (ball_speed - 2);           -- light down
                 END CASE;
             ELSE  -- Serve right
                 ball_x_motion <= ball_speed;  -- Right
                 CASE serve_angle IS
-                    WHEN "00" => ball_y_motion <= (NOT (ball_speed - 2)) + 1;  -- Slight up
-                    WHEN "01" => ball_y_motion <= ball_speed;                   -- Down
-                    WHEN "10" => ball_y_motion <= (NOT ball_speed) + 1;        -- Up
-                    WHEN OTHERS => ball_y_motion <= (ball_speed - 2);          -- Slight down
+                    WHEN "00" => ball_y_motion <= (NOT (ball_speed - 2)) + 1;   -- light up
+                    WHEN "01" => ball_y_motion <= ball_speed;                   -- DOWN
+                    WHEN "10" => ball_y_motion <= (NOT ball_speed) + 1;         -- UP
+                    WHEN OTHERS => ball_y_motion <= (ball_speed - 2);           -- light down
                 END CASE;
             END IF;
             
-            -- Reset ball position
+            -- reset ball pos - start middle every time
             ball_x <= CONV_STD_LOGIC_VECTOR(400, 11);
             ball_y <= CONV_STD_LOGIC_VECTOR(300, 11);
         END IF;
@@ -283,22 +284,21 @@ BEGIN
 --        END IF;
 
         -- SCORING LOGIC
-        IF ball_x + bsize >= 800 THEN  -- Right wall, point for player 1
+        IF ball_x + bsize >= 800 THEN  -- right wall = player1 pt
             score1_count <= score1_count + 1;
-            -- Convert integer directly to the correct hex value for display
-            score1_reg <= CONV_STD_LOGIC_VECTOR(score1_count + 1, 4);  -- Add 1 here for immediate update
+            -- conv int to hex val fro display
+            score1_reg <= CONV_STD_LOGIC_VECTOR(score1_count + 1, 4);  -- + 1 
             game_on <= '0';
             ball_x <= CONV_STD_LOGIC_VECTOR(400, 11);
             ball_y <= CONV_STD_LOGIC_VECTOR(300, 11);
-        ELSIF ball_x <= bsize THEN     -- Left wall, point for player 2
-            score2_count <= score2_count + 1;
-            -- Convert integer directly to the correct hex value for display
-            score2_reg <= CONV_STD_LOGIC_VECTOR(score2_count + 1, 4);  -- Add 1 here for immediate update
+        ELSIF ball_x <= bsize THEN     -- left wall = player2 pt
+            score2_count <= score2_count + 1;            
+            -- conv int to hex val fro display
+            score2_reg <= CONV_STD_LOGIC_VECTOR(score2_count + 1, 4);  -- + 1
             game_on <= '0';
             ball_x <= CONV_STD_LOGIC_VECTOR(400, 11);
             ball_y <= CONV_STD_LOGIC_VECTOR(300, 11);
         END IF;
-
         
 --         with l & r handling
 --         CHANGE: Handle bat collisions for both bats
@@ -318,7 +318,7 @@ BEGIN
 --            ball_x_motion <= (NOT ball_speed) + 1;
 --        END IF;
     -- UPDATED
-    -- Left bat collision with random bounce
+    -- left bat collision w/ random bounce, based on above x2
     IF (ball_x - bsize <= bat1_x + bat_w) AND
        (ball_x + bsize >= bat1_x - bat_w) AND
        (ball_y + bsize >= bat1_y - bat_h) AND
@@ -336,7 +336,7 @@ BEGIN
         END IF;
     END IF;
     
-    -- Right bat collision with random bounce
+    -- right bat collision w/ random bounce
     IF (ball_x + bsize >= bat2_x - bat_w) AND
        (ball_x - bsize <= bat2_x + bat_w) AND
        (ball_y + bsize >= bat2_y - bat_h) AND
