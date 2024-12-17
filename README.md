@@ -44,6 +44,7 @@ Will:
 - Implemented randomess from bat impacts and serve as opposed to continuous tragectory.
 
 ## Overview of Changes Made in pong.vhd and bat_n_ball.vhd
+## *PLEASE NOTE ALL CHANGES IN CODE HAVE BEEN TRACKED AND DISPLAYED VIA "CHANGE" COMMENTS THROUGHOUT CODE FILES*
 ### Key Modifications in **pong.vhd**
 
 ### Two-Paddle Gameplay Logic:
